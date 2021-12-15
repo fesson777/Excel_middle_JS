@@ -1,0 +1,29 @@
+{
+  "name": "excel_middle_js",
+  "version": "1.0.0",
+  "description": "JS middle",
+  "main": "webpack.config.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "start": "webpack",
+    "build": "webpack --mode production"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/fesson777/Excel_middle_JS.git"
+  },
+  "keywords": [
+    "js",
+    "webpack"
+  ],
+  "author": "Dmitry M",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/fesson777/Excel_middle_JS/issues"
+  },
+  "homepage": "https://github.com/fesson777/Excel_middle_JS#readme",
+  "devDependencies": {
+    "webpack": "^5.65.0",
+    "webpack-cli": "^4.9.1"
+  }
+}
