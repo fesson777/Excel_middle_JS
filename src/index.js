@@ -1,2 +1,4 @@
 import './module'
-console.log('work')
+import './scss/index.scss'
+
+console.log(process.env.NODE_ENV)
