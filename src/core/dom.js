@@ -22,6 +22,29 @@ class Dom {
     this.$el.append(node)
     return this
   }
+  // для ресайза таблицы
+  closest(selector) {
+    return $(this.$el.closest(selector))
+  }
+  //получение координат колонок и рядов
+  getCoords() {
+    return this.$el.getBoundingClientRect()
+  }
+  //для получения data atrribute с кол и строк // getter, вызов без ()
+  get dataset() {
+    return this.$el.dataset
+  }
+  //querySelector
+  findAll(selector) {
+    return this.$el.querySelectorAll(selector)
+  }
+  css(styles = {}) {
+    // для ресайза
+    Object.keys(styles).forEach((someStyle) => {
+      this.$el.style[someStyle] = styles[someStyle]
+    })
+  }
+
   on(eventType, callback) {
     this.$el.addEventListener(eventType, callback)
   }
