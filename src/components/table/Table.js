@@ -1,29 +1,27 @@
+import { $ } from '../../core/dom'
 import { ExcelComponent } from '../../core/ExcelComponent'
+import { resizeHandler } from './table.resize'
 import { createTable } from './table.template'
 
 export class Table extends ExcelComponent {
   static className = 'excel__table'
+  constructor($root) {
+    super($root, {
+      name: 'Table',
+      listeners: ['mousedown'],
+    })
+  }
 
   toHTML() {
-    return createTable(20)
+    return createTable(20) //создаем таблицу
   }
-}
 
-// //`
-// <div class="row">
-// <div class="row-info"></div>
-// <div class="row-data">
-//   <div class="column">A</div>
-//   <div class="column">B</div>
-//   <div class="column">C</div>
-// </div>
-// </div>
-// <div class="row">
-// <div class="row-info">1</div>
-// <div class="row-data">
-//   <div class="cell selected" contenteditable="">A1</div>
-//   <div class="cell" contenteditable="">B1</div>
-//   <div class="cell" contenteditable="">C1</div>
-// </div>
-// </div>
-// `
+  onMousedown(event) {
+    if (event.target.dataset.resize) {
+      resizeHandler(this.$root, event) // запускаем ресайз
+    }
+  }
+
+  onMouseup() {}
+  onClick() {}
+}
