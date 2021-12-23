@@ -5,3 +5,45 @@ export function getNameMethod(string) {
   }
   return `on${string.charAt(0).toUpperCase() + string.slice(1)}`
 }
+
+export function range(start, end) {
+  if (start > end) {
+    ;[end, start] = [start, end]
+  }
+  return new Array(end - start + 1).fill('').map((_, i) => {
+    return start + i
+  })
+}
+
+export function matrixPosition($target, $current) {
+  const target = $target.id(true) // to cells for multisel
+  const current = $current.id(true) // from cells for multisel
+  const cols = range(current.col, target.col) //get arr from id colums
+  const rows = range(current.row, target.row) //get arr from id
+  return cols.reduce((acc, col) => {
+    rows.forEach((row) => acc.push(`${row}:${col}`))
+    return acc
+  }, [])
+}
+
+export function nextSelector(key, { col, row }) {
+  const MIN_VALUE = 0
+  switch (key) {
+    case 'Enter':
+    case 'ArrowDown':
+      row++
+      break
+    case 'Tab':
+    case 'ArrowRight':
+      col++
+      break
+    case 'ArrowLeft':
+      col = --col < MIN_VALUE ? MIN_VALUE : col--
+      break
+    case 'ArrowUp':
+      row = --row < MIN_VALUE ? MIN_VALUE : row--
+      break
+  }
+
+  return `[data-id="${row}:${col}"]`
+}
