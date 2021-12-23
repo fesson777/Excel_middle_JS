@@ -1,14 +1,17 @@
 import { $ } from '../../core/dom'
 import { ExcelComponent } from '../../core/ExcelComponent'
+import { matrixPosition, nextSelector } from '../../core/utils'
 import { resizeHandler } from './table.resize'
 import { createTable } from './table.template'
+import { TableSelection } from './TableSelection'
 
 export class Table extends ExcelComponent {
   static className = 'excel__table'
-  constructor($root) {
+  constructor($root, options) {
     super($root, {
       name: 'Table',
-      listeners: ['mousedown'],
+      listeners: ['mousedown', 'keydown', 'input'],
+      ...options,
     })
   }
 
@@ -16,12 +19,70 @@ export class Table extends ExcelComponent {
     return createTable(20) //создаем таблицу
   }
 
+  prepare() {
+    //вызывается до init в ExcelComponent
+    this.selection = new TableSelection()
+  }
+  init() {
+    super.init() // вызов наследуемого метода initDomListener
+    const $cell = this.$root.find('[data-id="0:0"]')
+    this.selection.select($cell)
+    this.$emit('table:select', $cell)
+
+    this.$on(
+      'formula:input',
+      (
+        text //$on (emitter) from ExcelComponent
+      ) => this.selection.current.text(text)
+    )
+    this.$on('formula:done', () => {
+      this.selection.current.focus()
+    })
+  }
+
   onMousedown(event) {
     if (event.target.dataset.resize) {
       resizeHandler(this.$root, event) // запускаем ресайз
     }
+    if (event.target.dataset.type === 'cell') {
+      this.$emit('table:input', $(event.target))
+
+      const $target = $(event.target)
+      if (event.shiftKey) {
+        //current live in selection.select
+        const $cells = matrixPosition($target, this.selection.current).map(
+          (id) => {
+            return this.$root.find(`[data-id="${id}"]`)
+          }
+        )
+        this.selection.selectGroup($cells)
+      } else {
+        this.selection.select($target)
+      }
+    }
+  }
+  onKeydown(event) {
+    const keys = [
+      'Enter',
+      'Tab',
+      'ArrowLeft',
+      'ArrowRight',
+      'ArrowDown',
+      'ArrowUp',
+    ]
+    const { key } = event
+
+    if (keys.includes(key) && !event.shiftKey) {
+      event.preventDefault()
+      const id = this.selection.current.id(true)
+      const $next = this.$root.find(nextSelector(key, id))
+      this.selection.select($next)
+      //передача данных в Formula
+      this.$emit('table:select', $next)
+    }
   }
 
-  onMouseup() {}
-  onClick() {}
+  onInput(event) {
+    this.$emit('table:input', $(event.target))
+  }
 }
