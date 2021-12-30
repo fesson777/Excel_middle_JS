@@ -34,7 +34,10 @@ export class Table extends ExcelComponent {
       'formula:input',
       (
         text //$on (emitter) from ExcelComponent
-      ) => this.selection.current.text(text)
+      ) => {
+        this.selection.current.text(text)
+        this.updateTextinStore(text)
+      }
     )
     this.$on('formula:done', () => {
       this.selection.current.focus()
@@ -96,7 +99,17 @@ export class Table extends ExcelComponent {
     }
   }
 
+  updateTextinStore(value) {
+    this.$dispatch(
+      actions.changeText({
+        id: this.selection.current.id(),
+        value,
+      })
+    )
+  }
+
   onInput(event) {
-    this.$emit('table:input', $(event.target))
+    // this.$emit('table:input', $(event.target))
+    this.updateTextinStore($(event.target).text())
   }
 }

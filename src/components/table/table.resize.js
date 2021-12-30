@@ -53,7 +53,8 @@ export function resizeHandler($root, event) {
       }
       resolve({
         value,
-        id: type === 'col' ? $parent.dataset.col : null,
+        type,
+        id: $parent.dataset[type],
       })
     }
   })

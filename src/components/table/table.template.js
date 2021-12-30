@@ -1,17 +1,28 @@
 const CODES = { A: 65, Z: 90 }
 const DEFAULT_WIDTH = 120
+const DEFAULT_HEIGHT = 24
+
+function getWidth(state, index) {
+  return (state[index] || DEFAULT_WIDTH) + 'px'
+}
+
+function getHeight(state, index) {
+  return (state[index] || DEFAULT_HEIGHT) + 'px'
+}
 
 function toCell(state, row) {
   //createCell
   return function (_, col) {
     const width = getWidth(state.colState, col)
+    const id = `${row}:${col}`
+    const data = state.dataState[id]
     return `
     <div class="cell"
      contenteditable=""
       data-col="${col}"
-       data-id="${row}:${col}"
+       data-id="${id}"
         data-type="cell"
-        style="width: ${width}">     
+        style="width: ${width}"> ${data || ''}     
     </div>
     `
   }
@@ -30,10 +41,11 @@ function toColumn({ letter, index, width }) {
     `
 }
 
-function createRow(index, content) {
+function createRow(index, content, state) {
   const resize = index ? `<div class="row-resize" data-resize="row"></div>` : ''
+  const height = getHeight(state, index)
   return `
-    <div class="row" data-type="resizable">
+    <div class="row" data-type="resizable" data-row="${index}" style="height:${height}">
         <div class="row-info">
         ${index}
         ${resize}
@@ -49,9 +61,6 @@ function toChar(_, index) {
   return String.fromCharCode(CODES.A + index) //get letter
 }
 
-function getWidth(state = 1, index) {
-  return (state[index] || DEFAULT_WIDTH) + 'px'
-}
 function withWidthFrom(state) {
   return function (letter, index) {
     return {
@@ -74,12 +83,12 @@ export function createTable(rowsCount = 15, state = {}) {
     .join('') // в итоге это ячейки строки для row-data
 
   //первая строка, техническая с буквами в row-data
-  rows.push(createRow('', colsLetter))
+  rows.push(createRow('', colsLetter, {}))
 
   for (let row = 0; row < rowsCount; row++) {
     const cells = new Array(colsCount).fill('').map(toCell(state, row)).join('')
 
-    rows.push(createRow(row + 1, cells))
+    rows.push(createRow(row + 1, cells, state.rowState))
   }
 
   return rows.join('')
