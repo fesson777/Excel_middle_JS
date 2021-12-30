@@ -9,7 +9,9 @@ export class ExcelComponent extends DomListener {
     super($root, options.listeners)
     this.name = options.name || ''
     this.emitter = options.emitter
+    this.store = options.store
     this.unSubscribers = []
+    this.storeUnSub = null
     this.prepare()
   }
   //Настраиваем компонент до itin
@@ -19,6 +21,14 @@ export class ExcelComponent extends DomListener {
   toHTML() {
     return ''
   }
+  $dispatch(action) {
+    this.store.dispatch(action)
+  }
+  //
+  $subscribe(fn) {
+    this.storeUnSub = this.store.subscribe(fn)
+  }
+
   //Уведомляем слушателей про события event
   $emit(event, ...args) {
     this.emitter.emit(event, ...args)
@@ -36,5 +46,6 @@ export class ExcelComponent extends DomListener {
   destroy() {
     this.removeDomListeners()
     this.unSubscribers.forEach((unsub) => unsub())
+    this.storeUnSub.unsubscribe()
   }
 }

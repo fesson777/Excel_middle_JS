@@ -6,6 +6,7 @@ export class Excel {
     // this.$el = document.querySelector(selector)
     this.$el = $(selector)
     this.components = options.components || []
+    this.store = options.store
     this.emitter = new Emitter()
   }
   //для создания корневой НОДы для екселя (append)
@@ -13,7 +14,7 @@ export class Excel {
     const $root = $.create('div', 'excel')
     // const $root = document.createElement('div')
     // $root.classList.add('excel')
-    const componentOptions = { emitter: this.emitter }
+    const componentOptions = { emitter: this.emitter, store: this.store }
 
     this.components = this.components.map((Component) => {
       const $el = $.create('div', Component.className)

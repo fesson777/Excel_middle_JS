@@ -4,6 +4,7 @@ import { matrixPosition, nextSelector } from '../../core/utils'
 import { resizeHandler } from './table.resize'
 import { createTable } from './table.template'
 import { TableSelection } from './TableSelection'
+import * as actions from '../redux/actionCreators'
 
 export class Table extends ExcelComponent {
   static className = 'excel__table'
@@ -16,7 +17,7 @@ export class Table extends ExcelComponent {
   }
 
   toHTML() {
-    return createTable(20) //создаем таблицу
+    return createTable(20, this.store.getState()) //создаем таблицу
   }
 
   prepare() {
@@ -38,11 +39,24 @@ export class Table extends ExcelComponent {
     this.$on('formula:done', () => {
       this.selection.current.focus()
     })
+
+    // this.$subscribe((state) => {
+    //   console.log('state from Table', state)
+    // })
+  }
+
+  async resizeTable(event) {
+    try {
+      const data = await resizeHandler(this.$root, event) // запускаем ресайз
+      this.$dispatch(actions.tableResize(data))
+    } catch (e) {
+      console.warn('resize data fail', e.message)
+    }
   }
 
   onMousedown(event) {
     if (event.target.dataset.resize) {
-      resizeHandler(this.$root, event) // запускаем ресайз
+      this.resizeTable(event)
     }
     if (event.target.dataset.type === 'cell') {
       this.$emit('table:input', $(event.target))
