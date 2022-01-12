@@ -12,7 +12,7 @@ class Dom {
   }
   // from Formula input  to cell (через Emitter)
   text(text) {
-    if (typeof text === 'string') {
+    if (typeof text !== 'undefined') {
       this.$el.textContent = text
       return this
     }
@@ -56,6 +56,13 @@ class Dom {
       this.$el.style[someStyle] = styles[someStyle]
     })
   }
+  // styles = []  набор строчек - стилей, которые нам нужны
+  getStyles(styles = []) {
+    return styles.reduce((res, s) => {
+      res[s] = this.$el.style[s]
+      return res
+    }, {})
+  }
   //querySelector for cell
   find(selector) {
     return $(this.$el.querySelector(selector))
@@ -91,6 +98,14 @@ class Dom {
   }
   off(eventType, callback) {
     this.$el.removeEventListener(eventType, callback)
+  }
+
+  attr(name, value) {
+    if (value) {
+      this.$el.setAttribute(name, value)
+      return this
+    }
+    return this.$el.getAttribute(name)
   }
 }
 

@@ -14,6 +14,7 @@
   &:active,
   &.active {
     color: $color;
+    box-shadow: 0 3px 1px 1px rgb(206, 204, 204);
   }
 
   &:hover {

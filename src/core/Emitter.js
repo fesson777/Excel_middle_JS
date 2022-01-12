@@ -25,8 +25,6 @@ export class Emitter {
       )
     }
   }
-
-  unsubscribe() {}
 }
 
 // test--test--test--test--test--test--test
