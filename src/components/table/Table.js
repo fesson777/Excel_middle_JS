@@ -1,13 +1,15 @@
 import { $ } from '../../core/dom'
 import { ExcelComponent } from '../../core/ExcelComponent'
-import { matrixPosition, nextSelector } from '../../core/utils'
+import { matrixPosition, nextSelector, parse } from '../../core/utils'
 import { resizeHandler } from './table.resize'
 import { createTable } from './table.template'
 import { TableSelection } from './TableSelection'
 import * as actions from '../redux/actionCreators'
+import { defaultStyle } from '../../constants'
 
 export class Table extends ExcelComponent {
   static className = 'excel__table'
+
   constructor($root, options) {
     super($root, {
       name: 'Table',
@@ -26,26 +28,34 @@ export class Table extends ExcelComponent {
   }
   init() {
     super.init() // вызов наследуемого метода initDomListener
-    const $cell = this.$root.find('[data-id="0:0"]')
-    this.selection.select($cell)
-    this.$emit('table:select', $cell)
+    this.selectCell(this.$root.find('[data-id="0:0"]'))
 
-    this.$on(
-      'formula:input',
-      (
-        text //$on (emitter) from ExcelComponent
-      ) => {
-        this.selection.current.text(text)
-        this.updateTextinStore(text)
-      }
-    )
+    this.$on('formula:input', (value) => {
+      this.selection.current.attr('data-value', value).text(parse(value))
+      this.updateTextinStore(value)
+    })
     this.$on('formula:done', () => {
       this.selection.current.focus()
     })
 
-    // this.$subscribe((state) => {
-    //   console.log('state from Table', state)
-    // })
+    this.$on('toolbar:applyStyle', (value) => {
+      this.selection.applyStyle(value)
+      this.$dispatch(
+        actions.applyStyle({
+          value,
+          ids: this.selection.selectedIds,
+        })
+      )
+    })
+  }
+
+  selectCell($cell) {
+    this.selection.select($cell)
+    this.$emit('table:select', $cell)
+    // getStyles  набор строчек - стилей, которые нам нужны (Dom)
+    const styles = $cell.getStyles(Object.keys(defaultStyle))
+
+    this.$dispatch(actions.changeStyles(styles))
   }
 
   async resizeTable(event) {
@@ -74,7 +84,7 @@ export class Table extends ExcelComponent {
         )
         this.selection.selectGroup($cells)
       } else {
-        this.selection.select($target)
+        this.selectCell($target)
       }
     }
   }
@@ -93,9 +103,7 @@ export class Table extends ExcelComponent {
       event.preventDefault()
       const id = this.selection.current.id(true)
       const $next = this.$root.find(nextSelector(key, id))
-      this.selection.select($next)
-      //передача данных в Formula
-      this.$emit('table:select', $next)
+      this.selectCell($next)
     }
   }
 

@@ -1,6 +1,7 @@
 import { createToolbar } from './toolbar.template'
 import { $ } from '../../core/dom'
 import { ExcelStateComponent } from '../../core/ExcelStateComponents'
+import { defaultStyle } from '../../constants'
 
 export class Toolbar extends ExcelStateComponent {
   static className = 'excel__toolbar'
@@ -9,17 +10,12 @@ export class Toolbar extends ExcelStateComponent {
     super($root, {
       name: 'Toolbar',
       listeners: ['click'],
+      subscribe: ['currentStyles'],
       ...options,
     })
   }
   prepare() {
-    const initialState = {
-      textAlign: 'left',
-      fontWeight: 'normal',
-      textDecoration: 'none',
-      fontStyle: 'normal',
-    }
-    this.initState(initialState)
+    this.initState(defaultStyle)
   }
 
   get template() {
@@ -30,14 +26,22 @@ export class Toolbar extends ExcelStateComponent {
     return this.template
   }
 
+  storeChange(changes) {
+    this.setState(changes.currentStyles)
+  }
+
   onClick(event) {
     const $target = $(event.target)
 
     if ($target.dataset.type === 'button') {
       const value = JSON.parse($target.dataset.value)
-      const key = Object.keys(value)[0]
-      this.setState({ [key]: value[key] })
-      console.log(this.state)
+
+      // передаем в Table данные о нажатой кнопке в toolbar
+      this.$emit('toolbar:applyStyle', value)
+
+      //базовое отображение было
+      // const key = Object.keys(value)[0]
+      // this.setState({ [key]: value[key] })
     }
   }
 }
