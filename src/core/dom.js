@@ -10,6 +10,7 @@ class Dom {
     }
     return this.$el.outerHTML.trim()
   }
+
   // from Formula input  to cell (через Emitter)
   text(text) {
     if (typeof text !== 'undefined') {
